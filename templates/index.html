@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Analyzer</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300..900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        /* Force light-on-dark regardless of OS dark mode */
+        :root {
+            color-scheme: dark;
+            --dark:     #313B4E;
+            --teal:     #B2DFDB;
+            --light:    #F0F0F0;
+            --white:    #ffffff;
+            --teal-dark: #7fb8b4;
+        }
+
+        * {
+            font-family: 'Darker Grotesque', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark) !important;
+            color: var(--white) !important;
+            font-size: 1.4rem;
+        }
+
+        /* Force all text elements to white */
+        p, span, li, small, label, textarea, input, button {
+            color: inherit;
+        }
+
+        /* ── WRAPPER ── */
+        .page-wrapper {
+            max-width: 60%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 1200px) { .page-wrapper { max-width: 90%; } }
+        @media (max-width: 768px)  { .page-wrapper { max-width: 100%; padding: 0 1.2rem; } }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background-color: var(--dark);
+            border-bottom: 1px solid rgba(178,223,219,0.15);
+            padding: 1.2rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--white) !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand span.accent {
+            color: var(--teal);
+        }
+
+        .navbar-brand img {
+            height: 44px;
+            width: auto;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            padding: 3.5rem 0 2.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2.7rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero p.lead {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: rgba(255,255,255,0.75);
+            max-width: 580px;
+            line-height: 1.65;
+        }
+
+        /* ── UPLOAD CARD ── */
+        .upload-card {
+            background-color: rgba(255,255,255,0.04) !important;
+            border: 1.5px dashed rgba(178,223,219,0.4) !important;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-card:hover,
+        .upload-card.dragover {
+            border-color: var(--teal);
+        }
+
+        .upload-card i.upload-icon {
+            font-size: 2.4rem;
+            color: var(--teal);
+            margin-bottom: 0.8rem;
+            display: block;
+        }
+
+        .upload-card p {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .upload-card small {
+            color: rgba(255,255,255,0.5);
+            font-size: 1rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn-choose {
+            margin-top: 1rem;
+            background-color: transparent;
+            border: 1.5px solid var(--teal);
+            color: var(--teal);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            padding: 0.35rem 1.2rem;
+            border-radius: 6px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn-choose:hover {
+            background-color: var(--teal);
+            color: var(--dark);
+        }
+
+        /* File info */
+        .file-info {
+            display: none;
+            margin-top: 0.9rem;
+            text-align: left;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .file-info span {
+            display: block;
+            line-height: 1.7;
+        }
+
+        .file-info .label {
+            color: var(--teal);
+            font-weight: 700;
+        }
+
+        /* ── JOB DESCRIPTION TEXTAREA ── */
+        .job-desc-textarea {
+            background-color: var(--dark);
+            border: 1.5px solid rgba(178,223,219,0.3);
+            border-radius: 10px;
+            color: var(--white);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            resize: none;
+            height: 100%;
+            min-height: 200px;
+            padding: 1rem 1.2rem;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .job-desc-textarea::placeholder {
+            color: rgba(255,255,255,0.35);
+        }
+
+        .job-desc-textarea:focus {
+            outline: none;
+            border-color: var(--teal);
+            background-color: var(--dark);
+            color: var(--white);
+            box-shadow: none;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── ACTION BUTTONS ── */
+        .btn-check-cv {
+            background-color: var(--teal);
+            color: var(--dark);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            padding: 0.55rem 2rem;
+            border: none;
+            border-radius: 7px;
+            transition: background 0.2s, opacity 0.2s;
+        }
+
+        .btn-check-cv:hover:not(:disabled) {
+            background-color: var(--teal-dark);
+            color: var(--dark);
+        }
+
+        .btn-check-cv:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background-color: transparent;
+            color: rgba(255,255,255,0.6);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            padding: 0.55rem 1.5rem;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            border-radius: 7px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-reset:hover:not(:disabled) {
+            border-color: rgba(255,255,255,0.5);
+            color: var(--white);
+        }
+
+        .btn-reset:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        /* ── PRIVACY NOTICE ── */
+        .privacy-notice {
+            background-color: rgba(255,255,255,0.04);
+            border: 1px solid rgba(178,223,219,0.15);
+            border-radius: 8px;
+            padding: 0.85rem 1.2rem;
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.55);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+        }
+
+        .privacy-notice i {
+            color: var(--teal);
+            font-size: 1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* ── FEATURE SECTIONS ── */
+        .feature-section {
+            padding: 4rem 0;
+        }
+
+        .feature-section h2 {
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-section p {
+            color: rgba(255,255,255,0.72);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .feature-img-wrap {
+            position: relative;
+        }
+
+        /* reversed section */
+        .feature-img-wrap.line-right {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .feature-section img {
+            border-radius: 10px;
+            width: 55%;
+            height: auto;
+            display: block;
+            margin-left: auto;
+        }
+
+        /* reversed section: image on left side, push to left edge */
+        .flex-md-row-reverse .feature-img-wrap img {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* tablet landscape (900px-1200px) — columns side by side, bigger images */
+        @media (max-width: 1200px) and (min-width: 900px) {
+            .feature-section img {
+                width: 80%;
+            }
+        }
+
+        /* tablet portrait (768px-900px) — columns stacked, keep small */
+        @media (max-width: 899px) and (min-width: 768px) {
+            .feature-section img {
+                width: 22%;
+                margin: 0 auto;
+            }
+        }
+
+        /* mobile */
+        @media (max-width: 767px) {
+            .feature-section img {
+                width: 70%;
+                margin: 0 auto;
+            }
+        }
+
+        .divider {
+            border-top: 1px solid rgba(178,223,219,0.12);
+        }
+
+        /* ── FAQ ── */
+        .faq-section {
+            padding: 3.5rem 0;
+        }
+
+        .faq-section h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+        }
+
+        .faq-card {
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid rgba(178,223,219,0.15);
+            border-radius: 0;  /* square corners as requested */
+            padding: 1.5rem;
+            height: 100%;
+        }
+
+        .faq-card .faq-q {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--teal);
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+
+        .faq-card .faq-q i {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .faq-card p {
+            font-size: 1.05rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid rgba(178,223,219,0.12);
+            padding: 1.5rem 0;
+            text-align: center;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.35);
+            font-weight: 500;
+        }
+
+        footer span.accent {
+            color: var(--teal);
+        }
+
+        /* ── DESKTOP: boost font sizes on large screens ── */
+        @media (min-width: 1200px) {
+            body { font-size: 1.55rem; }
+            .hero h1 { font-size: 3rem; }
+            .hero p.lead { font-size: 1.35rem; }
+            .upload-card p { font-size: 1.3rem; }
+            .upload-card small { font-size: 1.1rem; }
+            .btn-choose { font-size: 1.15rem; }
+            .file-info { font-size: 1.15rem; }
+            .job-desc-textarea { font-size: 1.2rem; }
+            .form-label { font-size: 1.2rem; }
+            .btn-check-cv, .btn-reset { font-size: 1.25rem; }
+            .privacy-notice { font-size: 1.15rem; }
+            .feature-section h2 { font-size: 1.75rem; }
+            .feature-section p { font-size: 1.2rem; }
+            .faq-section h2 { font-size: 1.9rem; }
+            .faq-card .faq-q { font-size: 1.25rem; }
+            .faq-card p { font-size: 1.15rem; }
+            footer { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <div class="page-wrapper w-100">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="CV Analyzer Logo">
+        </a>
+    </div>
+</nav>
+
+<!-- ── HERO + UPLOAD ── -->
+<section class="hero">
+    <div class="page-wrapper">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert mb-3" style="background:rgba(224,92,92,0.15); border:1px solid rgba(224,92,92,0.4); border-radius:8px; padding:0.9rem 1.2rem; color:#e05c5c; font-weight:600;">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <h1>Your resume.<br>Seen through a recruiter's eyes.</h1>
+        <p class="lead">
+            Most CVs are rejected before a human ever reads them. CV Analyzer uses Claude AI to score your
+            resume across five dimensions that actually matter — and tells you precisely what to fix,
+            not just that something is wrong.
+        </p>
+
+        <form id="cvForm" action="/analyze" method="POST" enctype="multipart/form-data">
+        <div class="row g-3 mt-3 align-items-stretch">
+
+            <!-- Upload Box -->
+            <div class="col-12 col-md-5 d-flex flex-column">
+                <label class="form-label" style="height:2rem; display:flex; align-items:center;">Your CV</label>
+                <div class="upload-card flex-grow-1" id="dropZone">
+                    <i class="bi bi-file-earmark-arrow-up upload-icon"></i>
+                    <p>Drag &amp; drop your CV here</p>
+                    <small>PDF or DOCX &nbsp;·&nbsp; Max 2 MB</small><br>
+                    <button class="btn-choose" id="chooseBtn" type="button">Choose file</button>
+                    <input type="file" id="fileInput" name="cv_file" accept=".pdf,.docx">
+                </div>
+
+                <!-- File info shown after upload -->
+                <div class="file-info" id="fileInfo">
+                    <span><span class="label">File name:</span> <span id="fileName">—</span></span>
+                    <span><span class="label">File size:</span> <span id="fileSize">—</span></span>
+                </div>
+            </div>
+
+            <!-- Job Description -->
+            <div class="col-12 col-md-7 d-flex flex-column">
+                <label class="form-label" style="height:2rem; display:flex; align-items:center;">Job Description <span style="color:rgba(255,255,255,0.4);font-weight:400;margin-left:0.3rem;">(optional)</span></label>
+                <textarea
+                    class="job-desc-textarea flex-grow-1"
+                    id="jobDescription"
+                    name="job_description"
+                    placeholder="Paste the job description here to get a tailored match analysis — we'll check keyword alignment, missing skills, and relevance to the specific role you're targeting."></textarea>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-3 mt-3">
+            <button type="submit" class="btn-check-cv" id="checkCvBtn" disabled>
+                <i class="bi bi-search me-1"></i> Check CV
+            </button>
+            <button type="button" class="btn-reset" id="resetBtn" disabled>
+                Reset
+            </button>
+        </div>
+
+        <!-- Privacy notice -->
+        <div class="privacy-notice mt-3">
+            <i class="bi bi-lock-fill"></i>
+            <span>
+                Your file is sent securely for text extraction and AI analysis only.
+                No CV data is stored on our servers — the file is discarded immediately after processing.
+            </span>
+        </div>
+
+        </form>
+
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURE SECTION 1 ── -->
+<section class="feature-section">
+    <div class="page-wrapper">
+        <div class="row align-items-center g-5">
+            <div class="col-12 col-md-6">
+                <h2>Turn vague experience into compelling bullets</h2>
+                <p>
+                    Most resumes suffer from the same problem: they describe what you did, not the value you created.
+                    Our AI identifies every bullet point that lacks measurable impact and tells you exactly how to rewrite it —
+                    with concrete examples drawn from high-performing CVs in your field.
+                </p>
+                <p>
+                    Whether you're a recent graduate or a seasoned professional, transforming passive descriptions into
+                    results-driven statements is the single highest-impact change you can make to your resume.
+                </p>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="feature-img-wrap">
+                    <img src="{{ url_for('static', filename='img/feature1.jpg') }}" alt="Person reviewing resume">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURE SECTION 2 ── -->
+<section class="feature-section">
+    <div class="page-wrapper">
+        <div class="row align-items-center g-5 flex-md-row-reverse">
+            <div class="col-12 col-md-6">
+                <h2>AI-powered analysis that goes beyond spell-check</h2>
+                <p>
+                    CV Analyzer evaluates your resume across five dimensions that actually matter to recruiters:
+                    <strong style="color:var(--teal)">Impact</strong> (are your achievements quantified?),
+                    <strong style="color:var(--teal)">Brevity</strong> (is every word earning its place?),
+                    <strong style="color:var(--teal)">Style</strong> (active voice, no clichés),
+                    <strong style="color:var(--teal)">Skills</strong> (are the right keywords present?), and
+                    <strong style="color:var(--teal)">Structure</strong> (are essential sections complete?).
+                </p>
+                <p>
+                    Each dimension receives its own score and badge — so you know exactly where to focus your edits,
+                    not just that something is "off."
+                </p>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="feature-img-wrap line-right">
+                    <img src="{{ url_for('static', filename='img/feature2.jpg') }}" alt="Data analysis on screen">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FEATURE SECTION 3 ── -->
+<section class="feature-section">
+    <div class="page-wrapper">
+        <div class="row align-items-center g-5">
+            <div class="col-12 col-md-6">
+                <h2>What our CV checker looks for</h2>
+                <p>Here's a snapshot of what the analysis covers:</p>
+                <p>
+                    — <strong>Action verbs &amp; impact language:</strong> Are you starting bullets with strong, specific verbs?<br>
+                    — <strong>Quantified achievements:</strong> Numbers, percentages, and outcomes make a difference.<br>
+                    — <strong>Brevity &amp; readability:</strong> Overly long bullets and repeated phrases hurt scannability.<br>
+                    — <strong>Buzzwords &amp; clichés:</strong> "Team player", "hard worker" — recruiters tune these out.<br>
+                    — <strong>Skills completeness:</strong> Hard and soft skills aligned with modern job expectations.<br>
+                    — <strong>Structure &amp; sections:</strong> Contact info, experience, education — nothing missing.
+                </p>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="feature-img-wrap">
+                    <img src="{{ url_for('static', filename='img/feature3.jpg') }}" alt="Professional working on laptop">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── FAQ ── -->
+<section class="faq-section">
+    <div class="page-wrapper">
+        <h2>Frequently Asked Questions</h2>
+        <div class="row g-3">
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> What does CV Analyzer actually check?</div>
+                    <p>It evaluates your resume across five scored dimensions: Impact, Brevity, Style, Skills, and Structure.
+                    Each area gets a score out of 100 and specific, actionable feedback — not generic tips.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> What file formats are supported?</div>
+                    <p>PDF and DOCX files up to 2 MB. These are the two most common formats for CVs and cover both
+                    professionally designed and plain-text resumes. TXT files are not supported to ensure accurate parsing.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> Is my CV stored anywhere?</div>
+                    <p>No. Your file is used only for text extraction and analysis, then discarded immediately.
+                    We do not store, log, or share any CV content. No account is required.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> What is a good overall score?</div>
+                    <p>A score above 75 generally indicates a strong, well-structured resume. Scores between 50–74 suggest
+                    clear areas for improvement. Below 50 usually means the resume needs significant rework in multiple areas.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> Does it work for CVs in other languages?</div>
+                    <p>The analysis is always returned in English regardless of the CV's language. The AI can read and understand
+                    CVs written in Greek, French, German, and other languages — feedback will still be accurate and relevant.</p>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="faq-card">
+                    <div class="faq-q"><i class="bi bi-question-circle-fill"></i> What does the Job Description field do?</div>
+                    <p>If you paste a job posting, the AI will also assess how well your CV matches that specific role —
+                    flagging missing keywords, skill gaps, and misaligned experience. It's optional but highly recommended.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="page-wrapper">
+        © 2026 <span class="accent">CV Analyzer</span> — All rights reserved &nbsp;·&nbsp; Developed by <span class="accent">GToumb</span>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const fileInput   = document.getElementById('fileInput');
+    const chooseBtn   = document.getElementById('chooseBtn');
+    const dropZone    = document.getElementById('dropZone');
+    const fileInfo    = document.getElementById('fileInfo');
+    const fileNameEl  = document.getElementById('fileName');
+    const fileSizeEl  = document.getElementById('fileSize');
+    const checkCvBtn  = document.getElementById('checkCvBtn');
+    const resetBtn    = document.getElementById('resetBtn');
+
+    // Open file picker
+    chooseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+
+    dropZone.addEventListener('click', (e) => {
+        if (e.target !== chooseBtn) fileInput.click();
+    });
+
+    // File selected via picker
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+    });
+
+    // Drag & drop
+    dropZone.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+        e.stopPropagation();
+        // Only remove if leaving the dropzone entirely (not a child element)
+        if (!dropZone.contains(e.relatedTarget)) {
+            dropZone.classList.remove('dragover');
+        }
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!['pdf', 'docx'].includes(ext)) {
+            alert('Please upload a PDF or DOCX file.');
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File size exceeds 2 MB limit.');
+            return;
+        }
+
+        fileNameEl.textContent = file.name;
+        fileSizeEl.textContent = (file.size / 1024).toFixed(0) + ' KB';
+        fileInfo.style.display = 'block';
+
+        checkCvBtn.disabled = false;
+        resetBtn.disabled   = false;
+    }
+
+    // Reset
+    resetBtn.addEventListener('click', () => {
+        fileInput.value       = '';
+        fileInfo.style.display = 'none';
+        fileNameEl.textContent = '—';
+        fileSizeEl.textContent = '—';
+        checkCvBtn.disabled   = true;
+        resetBtn.disabled     = true;
+        document.getElementById('jobDescription').value = '';
+    });
+</script>
+
+</body>
+</html>

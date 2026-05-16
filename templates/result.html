@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Analyzer — Results</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300..900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --dark:      #313B4E;
+            --dark2:     #263040;
+            --teal:      #B2DFDB;
+            --teal-dark: #7fb8b4;
+            --white:     #ffffff;
+            --success:   #4caf87;
+            --warning:   #e6a94a;
+            --danger:    #e05c5c;
+        }
+
+        * { font-family: 'Darker Grotesque', sans-serif; }
+
+        body {
+            background-color: var(--dark) !important;
+            color: var(--white) !important;
+            font-size: 1.15rem;
+        }
+
+        /* ── WRAPPER ── */
+        .page-wrapper {
+            max-width: 60%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        @media (max-width: 1200px) { .page-wrapper { max-width: 90%; } }
+        @media (max-width: 768px)  { .page-wrapper { max-width: 100%; padding: 0 1.2rem; } }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background-color: var(--dark);
+            border-bottom: 1px solid rgba(178,223,219,0.15);
+            padding: 1.2rem 0;
+        }
+        .navbar-brand {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--white) !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .navbar-brand img { height: 44px; width: auto; }
+
+        /* ── HERO ── */
+        .results-hero {
+            padding: 2.5rem 0 1.5rem;
+            border-bottom: 1px solid rgba(178,223,219,0.12);
+        }
+        .results-hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+        }
+        .results-hero p {
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* ── SCORE SECTION ── */
+        .score-section {
+            padding: 2.5rem 0;
+        }
+
+        /* Overall circular score */
+        .overall-score-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .circle-wrap {
+            position: relative;
+            width: 130px;
+            height: 130px;
+        }
+
+        .circle-wrap svg {
+            transform: rotate(-90deg);
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 10;
+        }
+
+        .circle-progress {
+            fill: none;
+            stroke: var(--teal);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 339.3;
+            stroke-dashoffset: 339.3;
+            transition: stroke-dashoffset 1.2s ease;
+        }
+
+        .circle-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .circle-text .score-number {
+            font-size: 2.4rem;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--white);
+        }
+
+        .circle-text .score-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* Sub-scores */
+        .sub-scores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sub-score-item {
+            flex: 1 1 140px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(178,223,219,0.12);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            text-align: center;
+        }
+
+        .sub-score-item .cat-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 0.4rem;
+        }
+
+        .sub-score-item .cat-score {
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .cat-score .out-of {
+            font-size: 1rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Badges */
+        .badge-result {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .badge-excellent { background: rgba(76,175,135,0.2); color: #4caf87; }
+        .badge-good      { background: rgba(230,169,74,0.2);  color: #e6a94a; }
+        .badge-needs     { background: rgba(224,92,92,0.2);   color: #e05c5c; }
+
+        /* ── JOB MATCH BANNER (shown only if job desc provided) ── */
+        .job-match-banner {
+            background: rgba(178,223,219,0.07);
+            border: 1px solid rgba(178,223,219,0.25);
+            border-radius: 8px;
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .job-match-banner .match-score {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--teal);
+            white-space: nowrap;
+        }
+        .job-match-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* ── CATEGORY CARDS ── */
+        .cards-section { padding-bottom: 2rem; }
+
+        .category-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(178,223,219,0.12);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .category-card .card-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.2rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-card .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0;
+        }
+
+        .category-card .card-title i {
+            color: var(--teal);
+            font-size: 1.1rem;
+        }
+
+        .toggle-icon {
+            color: rgba(255,255,255,0.4);
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.open { transform: rotate(180deg); }
+
+        .card-body-content { display: none; }
+        .card-body-content.open { display: block; }
+
+        .feedback-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feedback-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .feedback-list li:last-child { border-bottom: none; }
+
+        .feedback-list li i.positive { color: var(--success); flex-shrink: 0; margin-top: 3px; }
+        .feedback-list li i.negative { color: var(--danger);  flex-shrink: 0; margin-top: 3px; }
+
+        .feedback-group-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            margin-top: 0.8rem;
+        }
+        .feedback-group-label.pos { color: var(--success); }
+        .feedback-group-label.neg { color: var(--danger); }
+
+        /* ── RECOMMENDATIONS ── */
+        .recommendations-section {
+            background: rgba(178,223,219,0.06);
+            border: 1px solid rgba(178,223,219,0.2);
+            border-radius: 8px;
+            padding: 1.8rem;
+            margin-bottom: 3rem;
+        }
+
+        .recommendations-section h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recommendations-section p {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        /* ── ANALYZE AGAIN BUTTON ── */
+        .btn-again {
+            background-color: var(--teal);
+            color: var(--dark);
+            font-family: 'Darker Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            padding: 0.6rem 2rem;
+            border: none;
+            border-radius: 7px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 3rem;
+            transition: background 0.2s;
+        }
+        .btn-again:hover {
+            background-color: var(--teal-dark);
+            color: var(--dark);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid rgba(178,223,219,0.12);
+            padding: 1.5rem 0;
+            text-align: center;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.35);
+            font-weight: 500;
+        }
+        footer span.accent { color: var(--teal); }
+
+        /* ── DESKTOP BOOSTS ── */
+        @media (min-width: 1200px) {
+            body { font-size: 1.25rem; }
+            .results-hero h1 { font-size: 2.4rem; }
+            .sub-score-item .cat-name { font-size: 0.85rem; }
+            .category-card .card-title { font-size: 1.25rem; }
+            .feedback-list li { font-size: 1.1rem; }
+            .recommendations-section p { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <div class="page-wrapper w-100">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="CV Analyzer Logo">
+        </a>
+    </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="results-hero">
+    <div class="page-wrapper">
+        <h1>Your CV Analysis</h1>
+        <p>Analyzed on {{ analysis_date }} &nbsp;·&nbsp; <span style="color:var(--teal)">{{ filename }}</span></p>
+    </div>
+</section>
+
+<!-- ── SCORES ── -->
+<section class="score-section">
+    <div class="page-wrapper">
+        <div class="row align-items-center g-4">
+
+            <!-- Overall circle -->
+            <div class="col-12 col-md-3">
+                <div class="overall-score-wrap">
+                    <div class="circle-wrap">
+                        <svg width="130" height="130" viewBox="0 0 130 130">
+                            <circle class="circle-bg" cx="65" cy="65" r="54"/>
+                            <circle class="circle-progress" id="overallCircle" cx="65" cy="65" r="54"/>
+                        </svg>
+                        <div class="circle-text">
+                            <div class="score-number" id="overallNumber">{{ scores.overall }}</div>
+                            <div class="score-label">Overall</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub scores -->
+            <div class="col-12 col-md-9">
+                <div class="sub-scores">
+
+                    {% for cat in categories %}
+                    <div class="sub-score-item">
+                        <div class="cat-name">{{ cat.name }}</div>
+                        <div class="cat-score">
+                            {{ cat.score }}<span class="out-of">/100</span>
+                        </div>
+                        {% if cat.score >= 75 %}
+                            <span class="badge-result badge-excellent">Excellent</span>
+                        {% elif cat.score >= 50 %}
+                            <span class="badge-result badge-good">Good Start</span>
+                        {% else %}
+                            <span class="badge-result badge-needs">Needs Work</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div style="border-top: 1px solid rgba(178,223,219,0.12);"></div>
+
+<!-- ── CATEGORY CARDS ── -->
+<section class="cards-section pt-4">
+    <div class="page-wrapper">
+
+        {% if job_match %}
+        <!-- Job Match Banner -->
+        <div class="job-match-banner">
+            <div class="match-score">{{ job_match.score }}%</div>
+            <div>
+                <strong style="color:var(--white)">Job Match Score</strong>
+                <p>{{ job_match.summary }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% for cat in categories %}
+        <div class="category-card">
+            <div class="card-header-row" onclick="toggleCard('card-{{ loop.index }}')">
+                <h3 class="card-title">
+                    <i class="bi bi-{{ cat.icon }}"></i>
+                    {{ cat.name }}
+                    &nbsp;
+                    {% if cat.score >= 75 %}
+                        <span class="badge-result badge-excellent">Excellent</span>
+                    {% elif cat.score >= 50 %}
+                        <span class="badge-result badge-good">Good Start</span>
+                    {% else %}
+                        <span class="badge-result badge-needs">Needs Work</span>
+                    {% endif %}
+                </h3>
+                <i class="bi bi-chevron-down toggle-icon" id="icon-card-{{ loop.index }}"></i>
+            </div>
+
+            <div class="card-body-content" id="card-{{ loop.index }}">
+                <div class="feedback-group-label pos">✓ What's working</div>
+                <ul class="feedback-list">
+                    {% for item in cat.positives %}
+                    <li><i class="bi bi-check-circle-fill positive"></i> {{ item }}</li>
+                    {% endfor %}
+                </ul>
+
+                <div class="feedback-group-label neg">✗ Areas to improve</div>
+                <ul class="feedback-list">
+                    {% for item in cat.negatives %}
+                    <li><i class="bi bi-x-circle-fill negative"></i> {{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Recommendations -->
+        <div class="recommendations-section mt-3">
+            <h3><i class="bi bi-lightbulb-fill"></i> Key Recommendations</h3>
+            <p>{{ recommendations }}</p>
+        </div>
+
+        <!-- Analyze Again -->
+        <a href="{{ url_for('index') }}" class="btn-again">
+            <i class="bi bi-arrow-left me-2"></i>Analyze Another CV
+        </a>
+
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="page-wrapper">
+        © 2026 <span class="accent">CV Analyzer</span> — All rights reserved &nbsp;·&nbsp; Developed by <span class="accent">GToumb</span>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ── Animate overall circle on load ──
+    const overall = {{ scores.overall }};
+    const circumference = 339.3;
+    const offset = circumference - (overall / 100) * circumference;
+
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('overallCircle').style.strokeDashoffset = offset;
+        }, 200);
+    });
+
+    // ── Toggle category cards ──
+    function toggleCard(id) {
+        const body = document.getElementById(id);
+        const icon = document.getElementById('icon-' + id);
+        body.classList.toggle('open');
+        icon.classList.toggle('open');
+    }
+
+    // Open first card by default
+    toggleCard('card-1');
+</script>
+
+</body>
+</html>
